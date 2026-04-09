@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VedLang Platform</title>
+  <style>
+    body { font-family: Arial; text-align: center; }
+    input, textarea { margin: 5px; padding: 5px; }
+    textarea { width: 80%; height: 150px; }
+    #platform, #editor { display: none; }
+  </style>
+</head>
+
+<body>
+
+<h1>🔥 VedLang Platform</h1>
+
+<!-- LOGIN / PROFILE -->
+<div id="login">
+  <h2>Create Profile</h2>
+
+  <input id="name" placeholder="Name"><br>
+  <input id="email" placeholder="Email"><br>
+  <input id="phone" placeholder="Phone"><br>
+
+  <button onclick="sendCode()">Send Code</button><br><br>
+
+  <input id="code" placeholder="Enter Code"><br>
+
+  <button onclick="verify()">Verify & Enter</button>
+</div>
+
+<!-- PLATFORM -->
+<div id="platform">
+  <h2 id="welcome"></h2>
+
+  <button onclick="openMode('web')">🌐 Make Website</button>
+  <button onclick="openMode('app')">📱 Make App</button>
+  <button onclick="openMode('game')">🎮 Make Game</button>
+
+  <div id="editor">
+    <h3 id="modeTitle"></h3>
+
+    <textarea id="codeArea" placeholder="Write VedLang code..."></textarea><br><br>
+
+    <button onclick="run()">Run</button>
+    <button onclick="back()">⬅ Back</button>
+
+    <div id="output" style="margin-top:20px;"></div>
+  </div>
+</div>
+
+<script>
+
+let generatedCode = "";
+let mode = "";
+
+// SEND OTP
+function sendCode(){
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("email").value;
+  let phone = document.getElementById("phone").value;
+
+  if(name=="" || email=="" || phone==""){
+    alert("❌ Fill all fields");
+    return;
+  }
+
+  generatedCode = Math.floor(1000 + Math.random() * 9000);
+
+  alert("📩 Your Code: " + generatedCode); // demo OTP
+}
+
+// VERIFY
+function verify(){
+  let userCode = document.getElementById("code").value;
+  let name = document.getElementById("name").value;
+
+  if(userCode == generatedCode){
+    document.getElementById("login").style.display = "none";
+    document.getElementById("platform").style.display = "block";
+    document.getElementById("welcome").innerText = "Welcome " + name + " 🎉";
+  } else {
+    alert("❌ Wrong Code");
+  }
+}
+
+// OPEN MODE
+function openMode(type){
+  mode = type;
+  document.getElementById("editor").style.display = "block";
+
+  if(type === "web") document.getElementById("modeTitle").innerText = "🌐 Web Builder";
+  if(type === "app") document.getElementById("modeTitle").innerText = "📱 App Builder";
+  if(type === "game") document.getElementById("modeTitle").innerText = "🎮 Game Builder";
+}
+
+// BACK
+function back(){
+  document.getElementById("editor").style.display = "none";
+}
+
+// RUN VedLang
+function run(){
+  let code = document.getElementById("codeArea").value;
+
+  // Block other languages
+  if(code.includes("print") || code.includes("console") || code.includes("{")){
+    alert("❌ Only VedLang allowed");
+    return;
+  }
+
+  let lines = code.split("\n");
+  let output = "";
+
+  lines.forEach(line => {
+    let parts = line.trim().split(" ");
+
+    // WEB
+    if(mode === "web"){
+      if(parts[0] === "page"){
+        output += "<h1>" + parts.slice(1).join(" ") + "</h1>";
+      }
+      else if(parts[0] === "text"){
+        output += "<p>" + parts.slice(1).join(" ") + "</p>";
+      }
+      else if(parts[0] === "button"){
+        output += "<button>" + parts.slice(1).join(" ") + "</button>";
+      }
+    }
+
+    // APP
+    else if(mode === "app"){
+      if(parts[0] === "text"){
+        output += "<p>" + parts.slice(1).join(" ") + "</p>";
+      }
+      else if(parts[0] === "input"){
+        output += "<input placeholder='" + parts.slice(1).join(" ") + "'><br>";
+      }
+      else if(parts[0] === "button"){
+        output += "<button>" + parts.slice(1).join(" ") + "</button>";
+      }
+    }
+
+    // GAME
+    else if(mode === "game"){
+      if(parts[0] === "character"){
+        output += "<p>🧍 Character: " + parts[1] + "</p>";
+      }
+      else if(parts[0] === "map"){
+        output += "<p>🗺️ Map: " + parts[1] + "</p>";
+      }
+      else if(parts[0] === "background"){
+        output += "<p>🎨 Background: " + parts[1] + "</p>";
+      }
+      else if(parts[0] === "move"){
+        output += "<p>➡ Move " + parts[1] + "</p>";
+      }
+    }
+
+  });
+
+  document.getElementById("output").innerHTML = output;
+}
+
+</script>
+
+</body>
+</html>
